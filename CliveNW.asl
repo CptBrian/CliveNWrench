@@ -13,11 +13,14 @@ state("Clive 'N' Wrench", "Steam 1.00"){
 }
 
 startup{ // When the script first loads, before process connection
+	vars.ASLVersion = "ASL Version 1.3 – March 6, 2023";
 	vars.LoadSplit = "Split upon paused timer events (Loads & Cutscenes)";
+	vars.BackupIGT = "Save Backup IGT in cases where the game closes";
 
-	settings.Add("ASL Version 1.2 – March 6, 2023", false);
-	settings.Add("Click the 'Website' button for more info!", false);
+	settings.Add(vars.ASLVersion, false);
+	settings.Add("WebsiteTip", false, "Click the 'Website' button for more info!", vars.ASLVersion);
 	settings.Add(vars.LoadSplit, false);
+	settings.Add(vars.BackupIGT, true);
 
 	vars.SavedIGT = 0;
 }
@@ -69,7 +72,7 @@ reset{
 }
 
 update{
-	if(timer.CurrentPhase == TimerPhase.Running && old.IGT > 2 && old.IGT != null && (current.IGT == 0 || current.IGT == null)){
+	if(settings[vars.BackupIGT] && timer.CurrentPhase == TimerPhase.Running && old.IGT > 2 && old.IGT != null && (current.IGT == 0 || current.IGT == null)){
 		vars.SavedIGT += old.IGT; // Saves IGT in a failure event where the game closes, so a run can be continued despite true IGT being reset to 0
 		// This method may require unwavering stability of the IGT pointer to prevent SavedIGT increasing when it shouldn't. Thankfully, the IGT pointer is very simple in this game.
 	}
