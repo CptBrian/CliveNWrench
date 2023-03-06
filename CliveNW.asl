@@ -13,7 +13,7 @@ state("Clive 'N' Wrench", "Steam 1.00"){
 }
 
 startup{ // When the script first loads, before process connection
-	vars.LoadSplit = "Split upon paused timer events (Loads)";
+	vars.LoadSplit = "Split upon paused timer events (Loads & Cutscenes)";
 
 	settings.Add("ASL Version 1.1 – March 6, 2023", false);
 	settings.Add("Click the 'Website' button for more info!", false);
