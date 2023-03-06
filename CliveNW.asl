@@ -1,6 +1,6 @@
 /*
 	Clive 'N' Wrench (Released February 23, 2023) https://store.steampowered.com/app/1094720
-	ASL originally by CptBrian & Tipdaddy78
+	ASL originally by CptBrian & TipDaddy78
 */
 
 state("Clive 'N' Wrench", "Unknown Version"){ // Fail-safe copy of whichever version is most popular
@@ -15,7 +15,7 @@ state("Clive 'N' Wrench", "Steam 1.00"){
 startup{ // When the script first loads, before process connection
 	vars.LoadSplit = "Split upon paused timer events (Loads & Cutscenes)";
 
-	settings.Add("ASL Version 1.1 – March 6, 2023", false);
+	settings.Add("ASL Version 1.2 – March 6, 2023", false);
 	settings.Add("Click the 'Website' button for more info!", false);
 	settings.Add(vars.LoadSplit, false);
 
@@ -69,8 +69,8 @@ reset{
 }
 
 update{
-	if(old.IGT > 2 && old.IGT != null && (current.IGT == 0 || current.IGT == null)){
-		vars.SavedIGT += old.IGT; // Saves IGT in a failure event where the game must be closed, so a run can be continued despite true IGT being reset to 0
+	if(timer.CurrentPhase == TimerPhase.Running && old.IGT > 2 && old.IGT != null && (current.IGT == 0 || current.IGT == null)){
+		vars.SavedIGT += old.IGT; // Saves IGT in a failure event where the game closes, so a run can be continued despite true IGT being reset to 0
 		// This method may require unwavering stability of the IGT pointer to prevent SavedIGT increasing when it shouldn't. Thankfully, the IGT pointer is very simple in this game.
 	}
 }
