@@ -4,12 +4,12 @@
 */
 
 state("Clive 'N' Wrench", "Unknown Version"){ // Fail-safe copy of whichever version is most popular
-	float IGT     : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
-	byte TPause   : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
+	float IGT   : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
+	byte TPause : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
 }
 state("Clive 'N' Wrench", "Steam 1.00"){
-	float IGT     : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
-	byte TPause   : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
+	float IGT   : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
+	byte TPause : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
 }
 
 startup{ // When the script first loads, before process connection
