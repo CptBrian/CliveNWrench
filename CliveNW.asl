@@ -16,7 +16,7 @@ state("Clive 'N' Wrench", "Steam 1.00"){
 
 startup{ // When the script first loads, before process connection
 	vars.ASLVersion = "ASL Version 1.3 – March 6, 2023";
-	vars.LoadSplit = "Split upon paused timer events (Loads & Cutscenes)";\
+	vars.LoadSplit = "Split upon paused timer events (Loads & Cutscenes)";
 	vars.BackupIGT = "Save Backup IGT in cases where the game closes. ('Reset' does not function with this.)";
 	vars.ILMode = "Use IL Mode, timer will not start until a level is entered. NOT SAFE FOR FULL-GAME RUNS";
 
