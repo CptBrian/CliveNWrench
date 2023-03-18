@@ -4,34 +4,42 @@
 */
 
 state("Clive 'N' Wrench", "Unknown Version"){ // Fail-safe copy of whichever version is most popular
-	float IGT   : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
-	byte TPause : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
-	int stageId : "mono-2.0-bdwgc.dll", 0x499C78, 0xE20, 0x3C;
+	float IGT       : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24;
+	byte TPause     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x28;
+	int stageId     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF30, 0x20;
+	int stoneCount  : "mono-2.0-bdwgc.dll", 0x3A2BFC, 0xD0, 0x51C, 0xC;
+	byte Loading    : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF20, 0x54;
+	byte LoadScreen : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF20, 0x14, 0x3C;
 }
 state("Clive 'N' Wrench", "PC 1.0"){
-	float IGT   : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
-	byte TPause : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
-	int stageId : "mono-2.0-bdwgc.dll", 0x499C78, 0xE20, 0x3C;
+	float IGT       : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38;
+	byte TPause     : "mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x3C;
+	int stageId     : "mono-2.0-bdwgc.dll", 0x499C78, 0xE20, 0x3C;
+	int stoneCount  : "mono-2.0-bdwgc.dll", 0x499C78, 0xBA0, 0x20, 0x30, 0x38, 0x14;
+	byte Loading    : "mono-2.0-bdwgc.dll", 0x499C78, 0xE00, 0xA4;
+	byte LoadScreen : "mono-2.0-bdwgc.dll", 0x499C78, 0xE00, 0x28, 0x78;
 }
 state("Clive 'N' Wrench", "Steam 1.1"){
-	float IGT   : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24;
-	byte TPause : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x28;
-	int stageId : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF30, 0x20;
-	int stoneCount : "mono-2.0-bdwgc.dll", 0x3A2BFC, 0xD0, 0x51C, 0xC; 
+	float IGT       : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24;
+	byte TPause     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x28;
+	int stageId     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF30, 0x20;
+	int stoneCount  : "mono-2.0-bdwgc.dll", 0x3A2BFC, 0xD0, 0x51C, 0xC;
+	byte Loading    : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF20, 0x54;
+	byte LoadScreen : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF20, 0x14, 0x3C;
 }
 
 startup{ // When the script first loads, before process connection
-	vars.ASLVersion = "ASL Version 1.4 – March 15, 2023";
+	vars.ASLVersion = "ASL Version 1.6 – March 18, 2023";
 	vars.LoadSplit = "Split upon paused timer events (Loads & Cutscenes)";
-	vars.BackupIGT = "Save Backup IGT in cases where the game closes. ('Reset' does not function with this.)";
 	vars.ILMode = "Use IL Mode, timer will not start until a level is entered. NOT SAFE FOR FULL-GAME RUNS";
 	vars.splitOnStones = "Split on # of Stones";
+	vars.IGTReset = "Reset IGT to 0 upon resetting splits";
 
 	settings.Add(vars.ASLVersion, false);
 	settings.Add("WebsiteTip", false, "Click the 'Website' button for more info!", vars.ASLVersion);
 	settings.Add(vars.LoadSplit, false);
-	settings.Add(vars.BackupIGT, true);
 	settings.Add(vars.ILMode, false);
+	settings.Add(vars.IGTReset, true);
 
 	// Add options to split on X stones
 	settings.Add(vars.splitOnStones, false);
@@ -40,10 +48,10 @@ startup{ // When the script first loads, before process connection
 		settings.Add(stoneText, false, stoneText, vars.splitOnStones);
 	}
 
-	vars.SavedIGT = 0;
 	vars.ILModePreIGT = 0; // Holds how much time has passed on IGT prior to timer starting.
 	vars.currentStoneCount = 0; // Holds how many stones have been collected on the current run.
 	vars.currentStoneCountOLD = 0; // Also holds how many stones have been collected, but causes split to only happen once.
+	vars.clearedIGT = false;
 
 	// Stage IDs
 	vars.hubWorld = 0;
@@ -84,22 +92,28 @@ init{ // When the process connects
 }
 
 onReset{ // Clears relevant local variables.
-	vars.SavedIGT = 0; 
 	vars.ILModePreIGT = 0;
 	vars.currentStoneCount = 0;
 	vars.currentStoneCountOLD = 0;
+
+	if(settings[vars.IGTReset]){
+		if(version == "PC 1.0"){
+			IntPtr temp;
+			new DeepPointer("mono-2.0-bdwgc.dll", 0x499C78, 0xBB0, 0x38).DerefOffsets(game, out temp); // IGT pointer
+			game.WriteBytes((IntPtr)temp, BitConverter.GetBytes((float)0) ); // Reset IGT to 0
+			vars.clearedIGT = true;
+		}
+		else if(version == "Steam 1.1"){
+			IntPtr temp;
+			new DeepPointer("mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24).DerefOffsets(game, out temp); // IGT pointer
+			game.WriteBytes((IntPtr)temp, BitConverter.GetBytes((float)0) ); // Reset IGT to 0
+			vars.clearedIGT = true;
+		}
+	}
 }
 
 isLoading{
-	return true; // Real timer always paused - Required to set IGT as our time
-}
-
-gameTime{
-	if (settings[vars.ILMode]) {
-		return TimeSpan.FromSeconds(current.IGT - vars.ILModePreIGT);
-	} else {
-		return TimeSpan.FromSeconds(current.IGT + vars.SavedIGT);
-	}
+	return (current.TPause == 1 || current.LoadScreen == 1);
 }
 
 start{
@@ -111,7 +125,7 @@ start{
 	if (settings[vars.ILMode]) { // Starts timer when entering a new level, but not at start of game.
 		vars.ILModePreIGT = current.IGT;
 		return old.stageId == vars.hubWorld && current.stageId != vars.hubWorld && current.IGT != 0;
-	} else if (old.IGT == 0 && current.IGT != old.IGT) { 
+	} else if (old.IGT == 0 && current.IGT != old.IGT && vars.clearedIGT == false) { 
 		return true; // Starts timer when entering game from main menu for the first time. IL Mode will skip this check. 
 	}
 	return false;
@@ -136,21 +150,16 @@ split{
 	return false;
 }
 
-reset{ // If you don't want to use this, uncheck the Reset box in LiveSplit's autosplitter config.
-	return (!settings[vars.BackupIGT] && old.IGT > 0 && current.IGT == 0);
+reset{
+	// Not yet
 }
 
 update{
-	if(settings[vars.BackupIGT] 						// Setting to save backup IGT is on
-		&& timer.CurrentPhase == TimerPhase.Running 	// Livesplit is set to run
-		&& old.IGT > 2 									// The previous frame's time is higher than 2 seconds
-		&& old.IGT != null 
-		&& (current.IGT == 0 || current.IGT == null)) {
-		vars.SavedIGT += old.IGT; // Saves IGT in a failure event where the game closes, so a run can be continued despite true IGT being reset to 0
-		// This method may require unwavering stability of the IGT pointer to prevent SavedIGT increasing when it shouldn't. Thankfully, the IGT pointer is very simple in this game.
-	}
-
 	if (old.stoneCount != current.stoneCount) { 
 		vars.currentStoneCount += 1; // Increment stored stone count when collecting a stone.
+	}
+
+	if(vars.clearedIGT == true && current.IGT > 2){
+		vars.clearedIGT = false; // Prevents timer from auto-starting immediately after resetting it
 	}
 }
