@@ -19,7 +19,7 @@ state("Clive 'N' Wrench", "PC 1.0"){
 	byte Loading    : "mono-2.0-bdwgc.dll", 0x499C78, 0xE00, 0xA4;
 	byte LoadScreen : "mono-2.0-bdwgc.dll", 0x499C78, 0xE00, 0x28, 0x78;
 }
-state("Clive 'N' Wrench", "Steam 1.1"){
+state("Clive 'N' Wrench", "PC 1.1"){
 	float IGT       : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24;
 	byte TPause     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x28;
 	int stageId     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF30, 0x20;
@@ -86,8 +86,8 @@ init{ // When the process connects
 	print("MD5Hash: " + vars.MD5Hash.ToString()); // Prints generated MD5 once to see within DebugView
 	
 	if(vars.MD5Hash == "441AF5A444F3D19019EA9713ECF8C914") version = "PC 1.0";
-	else if(vars.MD5Hash == "F113F4F54C9296AD5238A0E892406891") version = "Steam 1.1";
-	else if(vars.MD5Hash == "MindGoblin") version = "Steam 1.02";
+	else if(vars.MD5Hash == "F113F4F54C9296AD5238A0E892406891") version = "PC 1.1";
+	else if(vars.MD5Hash == "MindGoblin") version = "PC 1.2";
 	else version = "Unknown Version";
 }
 
@@ -103,7 +103,7 @@ onReset{ // Clears relevant local variables.
 			game.WriteBytes((IntPtr)temp, BitConverter.GetBytes((float)0) ); // Reset IGT to 0
 			vars.clearedIGT = true;
 		}
-		else if(version == "Steam 1.1"){
+		else if(version == "PC 1.1"){
 			IntPtr temp;
 			new DeepPointer("mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24).DerefOffsets(game, out temp); // IGT pointer
 			game.WriteBytes((IntPtr)temp, BitConverter.GetBytes((float)0) ); // Reset IGT to 0
