@@ -23,7 +23,7 @@ state("Clive 'N' Wrench", "PC 1.1"){
 	float IGT       : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x24;
 	byte TPause     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xDF8, 0x28;
 	int stageId     : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF30, 0x20;
-	int stoneCount  : "mono-2.0-bdwgc.dll", 0x3A2BFC, 0xD0, 0x51C, 0xC;
+	int stoneCount  : "mono-2.0-bdwgc.dll", 0x3A418C, 0xE98, 0x9C8, 0x1C, 0xC;
 	byte Loading    : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF20, 0x54;
 	byte LoadScreen : "mono-2.0-bdwgc.dll", 0x3A418C, 0xF20, 0x14, 0x3C;
 }
